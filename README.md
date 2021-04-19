@@ -11,6 +11,12 @@
 - Fully hardcoded tetris theme
 - Double-buffered 60 FPS graphics at 320x200 pixels with custom 8-bit RGB palette
 
+#### Resources Used
+- [osdev.org wiki](https://wiki.osdev.org/Main_Page)
+- [Sortix](https://sortix.org)
+- [ToaruOS](https://toaruos.org)
+- [James Molloy's Kernel Development Tutorials](http://www.jamesmolloy.co.uk/tutorial_html/)
+
 #### Running
 **NOTE**: This has *only* been tested in an emulator. Real hardware might not like it.
 
