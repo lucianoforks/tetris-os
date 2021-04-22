@@ -31,6 +31,8 @@ $ qemu-system-i386 -drive format=raw,file=boot.iso -d cpu_reset -monitor stdio -
 ##### Unix-like
 Use the same command as Mac OS, but try with `pulseaudio` as the audio device.
 
+If you're having issues with no image showing up/QEMU freezing, this is a known bug with QEMU SB16 emulation under GTK. [Please read what @takaswie has written in #2 for a workaround](https://github.com/jdah/tetris-os/issues/2#issuecomment-824773889).
+
 ##### Windows
 Absolutely no idea.
 
