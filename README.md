@@ -35,4 +35,4 @@ Use the same command as Mac OS, but try with `pulseaudio` as the audio device.
 Absolutely no idea.
 
 ##### Real hardware
-You probably know what you're doing if you're going to try this. Just burn `boot.iso` onto some bootable media and give it a go. If things break, try disabling all of the music since you *probably* don't have something with a SB16 in it.
+You probably know what you're doing if you're going to try this. Just burn `boot.iso` onto some bootable media and give it a go. If things break, try disabling all of the music (remove `#define ENABLE_MUSIC` in `main.c`) since you *probably* don't have something with a SB16 in it.
