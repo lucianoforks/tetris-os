@@ -33,9 +33,6 @@ ISO=boot.iso
 
 all: dirs bootsect kernel
 
-dirs:
-	mkdir -p bin
-
 clean:
 	rm -f ./**/*.o
 	rm -f ./*.iso
