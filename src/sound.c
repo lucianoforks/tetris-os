@@ -148,9 +148,10 @@ static const f64 NOTES[NUM_OCTAVES * OCTAVE_SIZE] = {
 #define DSP_IRQ     0x80
 
 #define SAMPLE_RATE     48000
-#define BUFFER_MS       30
+#define BUFFER_MS       40
 
 #define BUFFER_SIZE ((size_t) (SAMPLE_RATE * (BUFFER_MS / 1000.0)))
+
 static i16 buffer[BUFFER_SIZE];
 static bool buffer_flip = false;
 
