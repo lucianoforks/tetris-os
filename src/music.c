@@ -295,7 +295,7 @@ static const struct Note BRIDGE_SNARE[] = {
     SNARE_EIGTH,
 };
 
-#define TRACK_MAX_LENGTH (4 * (CHORUS_MELODY_LENGTH + BRIDGE_MELODY_LENGTH))
+#define TRACK_MAX_LENGTH (4 * (CHORUS_MELODY_LENGTH * 3 + BRIDGE_MELODY_LENGTH + 1))
 #define TRACK_PARTS 4
 static struct Note TRACK[TRACK_PARTS][TRACK_MAX_LENGTH];
 static size_t PART_LENGTHS[TRACK_PARTS];
@@ -318,7 +318,7 @@ void music_tick() {
         }
 
         // remove last tick to give each note an attack
-        if (current[i].ticks == 1) {
+        if (current[i].ticks <= 1) {
             sound_note(i, OCTAVE_1, NOTE_NONE);
         }
     }
@@ -329,29 +329,31 @@ void music_init() {
     sound_volume(0, 255);
 
     sound_wave(1, WAVE_NOISE);
-    sound_volume(1, 0);
+    sound_volume(1, 128);
 
     sound_wave(2, WAVE_TRIANGLE);
-    sound_volume(2, 0);
+    sound_volume(2, 196);
 
     sound_wave(3, WAVE_TRIANGLE);
-    sound_volume(3, 0);
+    sound_volume(3, 196);
 
-    memcpy(&TRACK[0][0], CHORUS_MELODY, sizeof(CHORUS_MELODY));
-    memcpy(&TRACK[0][CHORUS_MELODY_LENGTH], BRIDGE_MELODY, sizeof(BRIDGE_MELODY));
-    PART_LENGTHS[0] = CHORUS_MELODY_LENGTH + BRIDGE_MELODY_LENGTH;
+    // AABA part
+#define PART(_i, _c, _b) do {                           \
+        size_t cs = sizeof(_c) / sizeof(_c[0]),         \
+            bs = sizeof(_b) / sizeof(_b[0]),            \
+            n = 0;                                      \
+        memcpy(&TRACK[_i][n], _c, sizeof(_c)); n += cs; \
+        memcpy(&TRACK[_i][n], _c, sizeof(_c)); n += cs; \
+        memcpy(&TRACK[_i][n], _b, sizeof(_b)); n += bs; \
+        memcpy(&TRACK[_i][n], _c, sizeof(_c));          \
+        PART_LENGTHS[_i] = cs * 3 + bs;                 \
+    } while (0);
 
-    memcpy(&TRACK[1][0], CHORUS_SNARE, sizeof(CHORUS_SNARE));
-    memcpy(&TRACK[1][CHORUS_SNARE_LENGTH], BRIDGE_SNARE, sizeof(BRIDGE_SNARE));
-    PART_LENGTHS[1] = CHORUS_SNARE_LENGTH + BRIDGE_SNARE_LENGTH;
+    PART(0, CHORUS_MELODY, BRIDGE_MELODY);
+    PART(1, CHORUS_SNARE, BRIDGE_SNARE);
+    PART(2, CHORUS_BASS, BRIDGE_BASS);
+    PART(3, CHORUS_HARMONY, BRIDGE_HARMONY);
 
-    memcpy(&TRACK[2][0], CHORUS_BASS, sizeof(CHORUS_BASS));
-    memcpy(&TRACK[2][CHORUS_BASS_LENGTH], BRIDGE_BASS, sizeof(BRIDGE_BASS));
-    PART_LENGTHS[2] = CHORUS_BASS_LENGTH + BRIDGE_BASS_LENGTH;
-
-    memcpy(&TRACK[3][0], CHORUS_HARMONY, sizeof(CHORUS_HARMONY));
-    memcpy(&TRACK[3][CHORUS_HARMONY_LENGTH], BRIDGE_HARMONY, sizeof(BRIDGE_HARMONY));
-    PART_LENGTHS[3] = CHORUS_HARMONY_LENGTH + BRIDGE_HARMONY_LENGTH;
 
     for (size_t i = 0; i < TRACK_PARTS; i++) {
         indices[i] = -1;

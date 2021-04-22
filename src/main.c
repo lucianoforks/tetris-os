@@ -1,3 +1,6 @@
+// remove to disable music, useful when building for hardware without an SB16
+#define ENABLE_MUSIC
+
 #include "util.h"
 #include "screen.h"
 #include "idt.h"
@@ -9,8 +12,11 @@
 #include "keyboard.h"
 #include "speaker.h"
 #include "fpu.h"
+
+#ifdef ENABLE_MUSIC
 #include "sound.h"
 #include "music.h"
+#endif
 
 #define FPS 30
 #define LEVELS 30
@@ -694,14 +700,17 @@ void _main(u32 magic) {
     screen_init();
     timer_init();
     keyboard_init();
-    sound_init();
     generate_sprites();
+
+#ifdef ENABLE_MUSIC
+    sound_init();
     music_init();
+    state.music = true;
+    sound_master(255);
+#endif
 
     state.menu = true;
 
-    state.music = true;
-    sound_master(255);
 
     bool last_music_toggle = false;
     u32 last_frame = 0, last = 0;
@@ -709,10 +718,12 @@ void _main(u32 magic) {
     while (true) {
         const u32 now = (u32) timer_get();
 
+#ifdef ENABLE_MUSIC
         if (now != last) {
             music_tick();
             last = now;
         }
+#endif
 
         if ((now - last_frame) > (TIMER_TPS / FPS)) {
             last_frame = now;
