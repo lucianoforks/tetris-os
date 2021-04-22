@@ -736,6 +736,7 @@ void _main(u32 magic) {
                 render();
             }
 
+#ifdef ENABLE_MUSIC
             if (keyboard_char('m')) {
                 if (!last_music_toggle) {
                     state.music = !state.music;
@@ -746,6 +747,7 @@ void _main(u32 magic) {
             } else {
                 last_music_toggle = false;
             }
+#endif
 
             screen_swap();
             state.frames++;
