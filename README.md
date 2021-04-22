@@ -2,6 +2,8 @@
 
 ![screenshot](images/0.png)
 
+[Video with an explanation of the development process.](https://www.youtube.com/watch?v=FaILnmUYS_U)
+
 #### Features:
 - It's Tetris.
 - 32-bit (x86)
