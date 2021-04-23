@@ -42,7 +42,11 @@ $ make iso
 $ qemu-system-i386 -drive format=raw,file=boot.iso -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
 ```
 
-If you have sound device issues, try building without the `#define ENABLE_MUSIC` in `main.c` and running with `$ qemu-system-i386 -drive format=raw,file=boot.iso`.
+If you have sound device issues:
+- To disable music entirely, try building without the `#define ENABLE_MUSIC` in `main.c` and running with  
+`$ qemu-system-i386 -drive format=raw,file=boot.iso`.
+- Try using the SDL backend for QEMU:  
+`$ qemu-system-i386 -display sdl -drive format=raw,file=boot.iso -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl`
 
 If you're having issues with no image showing up/QEMU freezing, this is a known bug with QEMU SB16 emulation under GTK. [Please read what @takaswie has written in #2 for a workaround](https://github.com/jdah/tetris-os/issues/2#issuecomment-824773889).
 
