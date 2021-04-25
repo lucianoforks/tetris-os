@@ -35,27 +35,41 @@ _start:
     movb drive_num, %dl
     movw $disk_packet, %si
     movw $0x1000, segment
-    movw $1, sector
+    movw $2, chs_sector
 sector_loop:
-    movb $0x42, %ah
+    push %cx
+
+    movw segment, %es
+    movb $0x02, %ah
+    movb $1, %al
+    movw chs_sector, %cx
+    movw drive_num, %dx
+    movw offset, %bx
     int $0x13
     jc disk_error
 
-    addw $64, sector
-    addw $0x8000, offset
+    incb chs_sector
+    cmp $18, chs_sector
+    jne sector_same_head_cylinder
+    xorb $1, chs_head
+    jnz sector_same_head_cylinder
+    incb chs_cylinder
+sector_same_head_cylinder:
+    addw $0x0200, offset
     jnc sector_same_segment
 
     /* increment segment, reset offset if on different segment */
     addw $0x1000, segment
     movw $0x0000, offset
 sector_same_segment:
+    pop %cx
     /* decrements %cx and loops if nonzero */
     loop sector_loop
 
     /* video mode: 320x200 @ 16 colors */
     movb $0x00, %ah
     movb $0x13, %al
-    int $0x10
+/*    int $0x10 */
 
     /* enable A20 line */
     cli
@@ -67,7 +81,7 @@ sector_same_segment:
     call enable_a20_wait1
     xorw %ax, %ax
     inb $0x60
-
+    
     /* write new state with A20 bit set (0x2) */
     pushw %ax
     call enable_a20_wait0
@@ -77,11 +91,6 @@ sector_same_segment:
     popw %ax
     orw $0x2, %ax
     outb $0x60
-
-    /* enable PE flag */
-    movl %cr0, %eax
-    orl $0x1, %eax
-    movl %eax, %cr0
 
     /* jmp to flush prefetch queue */
     jmp flush
@@ -97,6 +106,12 @@ flush:
     movw %ax, %gs
     movw %ax, %ss
     movl $0x3000, %esp
+
+    /* enable PE flag */
+    movl %cr0, %eax
+    orl $0x1, %eax
+    movl %eax, %cr0
+
     ljmp $0x8, $entry32
 
 .code32
@@ -126,6 +141,9 @@ enable_a20_wait1:
 disk_error:
     movw $disk_error_str, %si
     call print
+1:
+    jmp 1b
+
 
 /* prints string in %ds:si */
 print:
@@ -145,13 +163,21 @@ print:
 1:  ret
 
 welcome_str:
-    .asciz "TETRIS TIME\n"
+    .asciz "TETRIS TIME\r\n"
 disk_error_str:
-    .asciz "DISK ERROR\n"
+    .asciz "DISK ERROR\r\n"
+debug_str:
+    .asciz "DEBUG\r\n"
 
+chs_sector:
+    .byte 0x01
+chs_cylinder:
+    .byte 0x00
 /* SAVED DRIVE NUMBER TO READ FROM */
 drive_num:
-    .word 0x0000
+    .byte 0x00
+chs_head:
+    .byte 0x00
 
 /* INT 13H PACKET */
 disk_packet:
@@ -197,6 +223,12 @@ gdt_end:
 idt:
     .word 0
     .long 0
+
+debug:
+    movw $debug_str, %si
+    call print
+1:
+    jmp 1b
 
 /* MBR BOOT SIGNATURE */
 .fill 510-(.-_start), 1, 0
