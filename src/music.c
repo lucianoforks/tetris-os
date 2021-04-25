@@ -303,7 +303,11 @@ static size_t PART_LENGTHS[TRACK_PARTS];
 static i32 indices[TRACK_PARTS];
 static struct NoteActive current[NUM_NOTES];
 
+extern bool sound_enabled;
+
 void music_tick() {
+    if (!sound_enabled) return;
+
     for (size_t i = 0; i < TRACK_PARTS; i++) {
         if (indices[i] == -1 || (current[i].ticks -= 1) <= 0) {
             indices[i] = (indices[i] + 1) % PART_LENGTHS[i];
@@ -325,6 +329,8 @@ void music_tick() {
 }
 
 void music_init() {
+    if (!sound_enabled) return;
+
     sound_wave(0, WAVE_TRIANGLE);
     sound_volume(0, 255);
 
