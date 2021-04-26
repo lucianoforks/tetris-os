@@ -79,7 +79,7 @@ disk_success:
     incb chs_head
     mov num_heads, %al
     cmp %al, chs_head
-    jne sector_same_head_cylinder
+    jna sector_same_head_cylinder
 
 /* head count exceeded, reset head to 0, increase cylinder */
     movb $0, chs_head
