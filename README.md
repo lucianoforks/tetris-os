@@ -51,7 +51,20 @@ If you have sound device issues:
 If you're having issues with no image showing up/QEMU freezing, this is a known bug with QEMU SB16 emulation under GTK. [Please read what @takaswie has written in #2 for a workaround](https://github.com/jdah/tetris-os/issues/2#issuecomment-824773889).
 
 #### Windows
-Absolutely no idea. Maybe try WSL.
+##### Running
+Grab the image file from the releases, and run it with qemu with command `qemu-system-i386 -display sdl -drive format=raw,file=boot.iso -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound`. This combats the GTK rendering bug with SB16 enabled. If your sound is choppy, try to fiddle with the audio settings, for instance running with `qemu-system-i386 -display sdl -drive format=raw,file=boot.iso -audiodev id=dsound,driver=dsound,out.fixed-settings=on,out.frequency=22050,out.buffer-length=80000,timer-period=100 -device sb16,audiodev=dsound` to increase the audio buffer and set a different timer period for updating the audio. Lowering the sample quality from 44 kHz to 22kHz helps combat choppy audio and buffer underruns with not that much of an audio quality hit.
+
+##### Compiling
+Grab and install [MSYS2](https://www.msys2.org/)  
+Grab and install [i686-elf-tools](https://github.com/lordmilko/i686-elf-tools)    
+* You need to extract the pre-compiled binary archive of i686-elf-tools to your mingw64 folder. Mine was at C:\msys64\mingw64
+* This is for cross-compiling the files to elf binary format, helps a lot to not need to battle with PE format binaries. The makefile uses i386-elf-tools, but this is basically the same thing. The name's different though, so either change the makefile, or make copies of the tools with i386 as the name.
+
+If everything was installed correctly, you should be able to open MSYS2 MINGW64 terminal and from there just do a 
+```
+>make iso
+>qemu-system-i386 boot.iso -display sdl -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound
+```
 
 #### Real hardware
 You probably know what you're doing if you're going to try this. Just burn `boot.iso` onto some bootable media and give it a go. If things break, try disabling all of the music (remove `#define ENABLE_MUSIC` in `main.c`) since you *probably* don't have something with a SB16 in it.
