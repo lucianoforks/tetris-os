@@ -31,6 +31,14 @@ _start:
        kernel binary has been placed on the disk directly after the first sector
        reading $20 * num_sectors sectors after (value in %cx)
      */
+
+    push %ax
+    push %bx
+    push %cx
+    push %dx
+    push %es
+    push %si
+
     movw $20, %cx
     movb drive_num, %dl
     movw $disk_packet, %si
@@ -42,15 +50,17 @@ sector_loop:
     movw segment, %es
     movb $0x02, %ah
     movb $1, %al
-    movw chs_sector, %cx
+    movb chs_cylinder, %ch
+    movb chs_sector, %cl
     movw drive_num, %dx
     movw offset, %bx
     int $0x13
     jc disk_error
 
     incb chs_sector
-    cmp $18, chs_sector
+    cmp $19, chs_sector
     jne sector_same_head_cylinder
+    movb $1, chs_sector
     xorb $1, chs_head
     jnz sector_same_head_cylinder
     incb chs_cylinder
@@ -66,10 +76,17 @@ sector_same_segment:
     /* decrements %cx and loops if nonzero */
     loop sector_loop
 
+    pop %si
+    pop %es
+    pop %dx
+    pop %cx
+    pop %bx
+    pop %ax
+
     /* video mode: 320x200 @ 16 colors */
     movb $0x00, %ah
     movb $0x13, %al
-/*    int $0x10 */
+    int $0x10 
 
     /* enable A20 line */
     cli
@@ -92,6 +109,11 @@ sector_same_segment:
     orw $0x2, %ax
     outb $0x60
 
+    /* enable PE flag */
+    movl %cr0, %eax
+    orl $0x1, %eax
+    movl %eax, %cr0
+    
     /* jmp to flush prefetch queue */
     jmp flush
 flush:
@@ -106,11 +128,6 @@ flush:
     movw %ax, %gs
     movw %ax, %ss
     movl $0x3000, %esp
-
-    /* enable PE flag */
-    movl %cr0, %eax
-    orl $0x1, %eax
-    movl %eax, %cr0
 
     ljmp $0x8, $entry32
 
