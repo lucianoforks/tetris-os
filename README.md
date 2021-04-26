@@ -6,7 +6,7 @@ This is a fork of TETRIS-OS originally by jdh
 ##### Planned
 - High quality PWM-based speaker sound
 ##### Wishful thinking
-- AC97 or HD-audio, depending on what is onboard the old computer. Requires PCI setup among other things, so not the easiest thing to combat.
+- AC97 or HD-audio, depending on what is onboard my old computer. Requires PCI setup among other things, so not the easiest thing to combat.
 
 # TETRIS-OS: An operating system that only plays Tetris.
 
