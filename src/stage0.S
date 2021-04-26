@@ -19,8 +19,7 @@ _start:
     movw $0x3000, %sp
 
     /* save drive number to read kernel later */
-    movw $drive_num, %si
-    mov %dl, (%si)
+    mov %dl, drive_num
 
     sti
 
