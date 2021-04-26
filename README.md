@@ -20,15 +20,13 @@
 - [James Molloy's Kernel Development Tutorials](http://www.jamesmolloy.co.uk/tutorial_html/)
 
 ### Building & Running
-~~**NOTE**: This has *only* been tested in an emulator. Real hardware might not like it.~~
-
-EDIT: this is not true anymore! [@parkerlreed has run this on a Thinkpad T510](https://github.com/jdah/tetris-os/issues/5#issuecomment-824507979).
+Tested on real hardware as well as QEMU.
 
 #### Mac OS
 For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install i386-elf-binutils i386-elf-gcc`
 ```
 $ make iso
-$ qemu-system-i386 -drive format=raw,file=boot.iso -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
+$ qemu-system-i386 -drive format=raw,file=boot.bin -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
 ```
 
 #### Unix-like
@@ -39,20 +37,20 @@ You should not need a cross-compiler in *most* cases as the `gcc` shipped in mos
 To run:
 ```
 $ make iso
-$ qemu-system-i386 -drive format=raw,file=boot.iso -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
+$ qemu-system-i386 -drive format=raw,file=boot.bin -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
 ```
 
 If you have sound device issues:
 - To disable music entirely, try building without the `#define ENABLE_MUSIC` in `main.c` and running with  
-`$ qemu-system-i386 -drive format=raw,file=boot.iso`.
+`$ qemu-system-i386 -drive format=raw,file=boot.bin`.
 - Try using the SDL backend for QEMU:  
-`$ qemu-system-i386 -display sdl -drive format=raw,file=boot.iso -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl`
+`$ qemu-system-i386 -display sdl -drive format=raw,file=boot.bin -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl`
 
 If you're having issues with no image showing up/QEMU freezing, this is a known bug with QEMU SB16 emulation under GTK. [Please read what @takaswie has written in #2 for a workaround](https://github.com/jdah/tetris-os/issues/2#issuecomment-824773889).
 
 #### Windows
 ##### Running
-Grab the image file from the releases, and run it with qemu with command `qemu-system-i386 -display sdl -drive format=raw,file=boot.iso -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound`. This combats the GTK rendering bug with SB16 enabled. If your sound is choppy, try to fiddle with the audio settings, for instance running with `qemu-system-i386 -display sdl -drive format=raw,file=boot.iso -audiodev id=dsound,driver=dsound,out.fixed-settings=on,out.frequency=22050,out.buffer-length=80000,timer-period=100 -device sb16,audiodev=dsound` to increase the audio buffer and set a different timer period for updating the audio. Lowering the sample quality from 44 kHz to 22kHz helps combat choppy audio and buffer underruns with not that much of an audio quality hit.
+Grab the image file from the releases, and run it with qemu with command `qemu-system-i386 -display sdl -drive format=raw,file=boot.bin -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound`. This combats the GTK rendering bug with SB16 enabled. If your sound is choppy, try to fiddle with the audio settings, for instance running with `qemu-system-i386 -display sdl -drive format=raw,file=boot.bin -audiodev id=dsound,driver=dsound,out.fixed-settings=on,out.frequency=22050,out.buffer-length=80000,timer-period=100 -device sb16,audiodev=dsound` to increase the audio buffer and set a different timer period for updating the audio. Lowering the sample quality from 44 kHz to 22kHz helps combat choppy audio and buffer underruns with not that much of an audio quality hit.
 
 ##### Compiling
 Grab and install [MSYS2](https://www.msys2.org/)  
@@ -63,8 +61,8 @@ Grab and install [i686-elf-tools](https://github.com/lordmilko/i686-elf-tools)
 If everything was installed correctly, you should be able to open MSYS2 MINGW64 terminal and from there just do a 
 ```
 >make iso
->qemu-system-i386 boot.iso -display sdl -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound
+>qemu-system-i386 boot.bin -display sdl -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound
 ```
 
 #### Real hardware
-You probably know what you're doing if you're going to try this. Just burn `boot.iso` onto some bootable media and give it a go. If things break, try disabling all of the music (remove `#define ENABLE_MUSIC` in `main.c`) since you *probably* don't have something with a SB16 in it.
+You probably know what you're doing if you're going to try this. Just burn `boot.bin` onto some bootable media and give it a go. SB16 is dynamically disabled in case it's not found or it's reset procedure fails, but if things break, try disabling all of the music (remove `#define ENABLE_MUSIC` in `main.c`) since you *probably* don't have something with a SB16 in it.
