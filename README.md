@@ -74,11 +74,7 @@ Grab and install [i686-elf-tools](https://github.com/lordmilko/i686-elf-tools)
 If everything was installed correctly, you should be able to open MSYS2 MINGW64 terminal and from there just do a 
 ```
 >make iso
-<<<<<<< HEAD
 >qemu-system-i386 boot.bin -display sdl -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound
-=======
->qemu-system-i386 boot.iso -display sdl -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound
->>>>>>> updated_windows_instructions
 ```
 
 #### Real hardware
