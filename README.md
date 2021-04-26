@@ -55,6 +55,9 @@ If you're having issues with no image showing up/QEMU freezing, this is a known 
 Grab the image file from the releases, and run it with qemu with command `qemu-system-i386 -display sdl -drive format=raw,file=boot.iso -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound`. This combats the GTK rendering bug with SB16 enabled. If your sound is choppy, try to fiddle with the audio settings, for instance running with `qemu-system-i386 -display sdl -drive format=raw,file=boot.iso -audiodev id=dsound,driver=dsound,out.fixed-settings=on,out.frequency=22050,out.buffer-length=80000,timer-period=100 -device sb16,audiodev=dsound` to increase the audio buffer and set a different timer period for updating the audio. Lowering the sample quality from 44 kHz to 22kHz helps combat choppy audio and buffer underruns with not that much of an audio quality hit.
 
 ##### Compiling
+Depending on your preference, you could setup a linux-like dev-env with WSL and follow the Linux instructions, or you can try the MINGW64 GCC environment for Windows. If you go the MINGW64 route, your best bet is to install MSYS2 and it should come packaged with that.
+
+Instructions for MINGW64:
 Grab and install [MSYS2](https://www.msys2.org/)  
 Grab and install [i386-elf-toolchain](https://github.com/nativeos/i386-elf-toolchain/releases)    
 * You need to extract the pre-compiled binary archive of both the GCC and Binutils releases (Windows x86_64 or i686) to your mingw64 folder. Mine was at C:\msys64\mingw64
