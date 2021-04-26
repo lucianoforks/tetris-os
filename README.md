@@ -1,3 +1,8 @@
+This is a fork of TETRIS-OS originally by jdh
+Current improvements:
+- Dynamically disabled SB16 so same binary works whether you have an SB16 or not.
+- CHS reads as backup in case LBA reads fail
+
 # TETRIS-OS: An operating system that only plays Tetris.
 
 ![screenshot](images/0.png)
