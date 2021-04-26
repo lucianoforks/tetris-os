@@ -19,7 +19,8 @@ _start:
     movw $0x3000, %sp
 
     /* save drive number to read kernel later */
-    mov %dl, drive_num
+    movw $drive_num, %si
+    mov %dl, (%si)
 
     sti
 
@@ -32,40 +33,61 @@ _start:
        reading $20 * num_sectors sectors after (value in %cx)
      */
 
-    push %ax
-    push %bx
-    push %cx
-    push %dx
-    push %es
-    push %si
-
-    movw $20, %cx
+    movb $8, %ah
     movb drive_num, %dl
-    movw $disk_packet, %si
+    int $0x13
+
+    movb %dh, num_heads
+    andb $1280, %cl
+    movb %cl, sectors_per_track
+
+    movw $0x3e, %cx
     movw $0x1000, segment
+    movw $0x0000, offset
+    movw $1, sector
     movw $2, chs_sector
 sector_loop:
     push %cx
 
-    movw segment, %es
+    movb $0x42, %ah
+    movb drive_num, %dl
+    movw $disk_packet, %si
+    int $0x13
+    jnc disk_success
+
     movb $0x02, %ah
-    movb $1, %al
+    movb $1, %al /* Read 1 sector */
     movb chs_cylinder, %ch
     movb chs_sector, %cl
-    movw drive_num, %dx
+    movb drive_num, %dl
+    movb chs_head, %dh
+    movw segment, %es
     movw offset, %bx
     int $0x13
     jc disk_error
 
+disk_success:
+    incb sector
+/* increase sectors, and check for track limit */
     incb chs_sector
-    cmp $19, chs_sector
-    jne sector_same_head_cylinder
+    
+    movb sectors_per_track, %al
+    cmp %al, chs_sector
+    jna sector_same_head_cylinder
+
+/* sectors per track exceeded, reset sector to 1, increase heads and check for head limit */
     movb $1, chs_sector
-    xorb $1, chs_head
-    jnz sector_same_head_cylinder
+    incb chs_head
+    mov num_heads, %al
+    cmp %al, chs_head
+    jna sector_same_head_cylinder
+
+/* head count exceeded, reset head to 0, increase cylinder */
+    movb $0, chs_head
     incb chs_cylinder
+
 sector_same_head_cylinder:
-    addw $0x0200, offset
+    addw $0x200, offset /* we read a single 512 sector, so increase our offset by 0x200 (512) */
     jnc sector_same_segment
 
     /* increment segment, reset offset if on different segment */
@@ -75,13 +97,6 @@ sector_same_segment:
     pop %cx
     /* decrements %cx and loops if nonzero */
     loop sector_loop
-
-    pop %si
-    pop %es
-    pop %dx
-    pop %cx
-    pop %bx
-    pop %ax
 
     /* video mode: 320x200 @ 16 colors */
     movb $0x00, %ah
@@ -128,7 +143,7 @@ flush:
     movw %ax, %gs
     movw %ax, %ss
     movl $0x3000, %esp
-
+    
     ljmp $0x8, $entry32
 
 .code32
@@ -196,12 +211,19 @@ drive_num:
 chs_head:
     .byte 0x00
 
+marker:
+    .byte 0xde,0xad,0xbe,0xef
+num_heads:
+    .byte 0x00
+sectors_per_track:
+    .byte 0x00
+
 /* INT 13H PACKET */
 disk_packet:
     .byte 0x10
     .byte 0x00
 num_sectors:
-    .word 0x0040
+    .word 0x0001
 offset:
     .word 0x0000
 segment:
