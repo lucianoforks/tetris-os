@@ -27,20 +27,21 @@ _start:
     movw $welcome_str, %si
     call print
 
-    /* read kernel into memory at 0x10000 (segment 0x1000).
-       kernel binary has been placed on the disk directly after the first sector
-       reading $20 * num_sectors sectors after (value in %cx)
-     */
-
     movb $8, %ah
     movb drive_num, %dl
     int $0x13
 
     movb %dh, num_heads
-    andb $1280, %cl
+    andb $0x3f, %cl
     movb %cl, sectors_per_track
 
-    movw $0x3e, %cx
+    /* read kernel into memory at 0x10000 (segment 0x1000).
+       kernel binary has been placed on the disk directly after the first sector
+       How many sectors do we read, value in cx
+       Decimal 1280 is the same as earlier 20 times 0x40 sectors
+     */
+
+    movw $1280, %cx
     movw $0x1000, segment
     movw $0x0000, offset
     movw $1, sector
