@@ -1,11 +1,11 @@
 This is a fork of TETRIS-OS originally by jdh
 
-Current improvements:
+##### Current improvements
 - Dynamically disabled SB16 so same binary works whether you have an SB16 or not.
 - CHS reads as backup in case LBA reads fail
-Planned:
+##### Planned
 - High quality PWM-based speaker sound
-Wishful thinking:
+##### Wishful thinking
 - AC97 or HD-audio, depending on what is onboard the old computer. Requires PCI setup among other things, so not the easiest thing to combat.
 
 # TETRIS-OS: An operating system that only plays Tetris.
