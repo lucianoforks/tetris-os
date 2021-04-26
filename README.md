@@ -56,9 +56,9 @@ Grab the image file from the releases, and run it with qemu with command `qemu-s
 
 ##### Compiling
 Grab and install [MSYS2](https://www.msys2.org/)  
-Grab and install [i686-elf-tools](https://github.com/lordmilko/i686-elf-tools)    
-* You need to extract the pre-compiled binary archive of i686-elf-tools to your mingw64 folder. Mine was at C:\msys64\mingw64
-* This is for cross-compiling the files to elf binary format, helps a lot to not need to battle with PE format binaries. The makefile uses i386-elf-tools, but this is basically the same thing. The name's different though, so either change the makefile, or make copies of the tools with i386 as the name.
+Grab and install [i386-elf-toolchain](https://github.com/nativeos/i386-elf-toolchain/releases)    
+* You need to extract the pre-compiled binary archive of both the GCC and Binutils releases (Windows x86_64 or i686) to your mingw64 folder. Mine was at C:\msys64\mingw64
+* This is for cross-compiling the files to elf binary format, helps a lot to not need to battle with PE format binaries. 
 
 If everything was installed correctly, you should be able to open MSYS2 MINGW64 terminal and from there just do a 
 ```
