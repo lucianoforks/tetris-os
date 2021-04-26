@@ -38,10 +38,9 @@ _start:
     /* read kernel into memory at 0x10000 (segment 0x1000).
        kernel binary has been placed on the disk directly after the first sector
        How many sectors do we read, value in cx
-       Decimal 1280 is the same as earlier 20 times 0x40 sectors
      */
 
-    movw $1280, %cx
+    movw $0x40, %cx
     movw $0x1000, segment
     movw $0x0000, offset
     movw $1, sector
