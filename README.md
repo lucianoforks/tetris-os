@@ -3,7 +3,7 @@ This is a fork of TETRIS-OS originally by jdh
 ##### Current improvements
 - Dynamically disabled SB16 so same binary works whether you have an SB16 or not.
 - CHS reads as backup in case LBA reads fail
-- Simple PC Speaker music playback in case SB16 is not found. Works on qemu with switches `-audiodev id=dsound,driver=dsound -machine pcspk-audiodev=dsound`
+- Simple PC Speaker music playback in case SB16 is not found. Tested with QEMU and real hardware.
 ##### Planned
 - High quality PWM-based speaker sound
 ##### Wishful thinking
