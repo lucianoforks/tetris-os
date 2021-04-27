@@ -31,7 +31,7 @@ BOOTSECT=bootsect.bin
 KERNEL=kernel.bin
 IMAGE=boot.bin
 
-all: dirs bootsect kernel
+all: image
 
 clean:
 	rm -f ./**/*.o
