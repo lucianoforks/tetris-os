@@ -152,7 +152,7 @@ static const f64 NOTES[NUM_OCTAVES * OCTAVE_SIZE] = {
 
 #define BUFFER_SIZE ((size_t) (SAMPLE_RATE * (BUFFER_MS / 1000.0)))
 
-bool sound_enabled = false;
+bool sb16_enabled = false;
 
 static i16 buffer[BUFFER_SIZE];
 static bool buffer_flip = false;
@@ -181,7 +181,7 @@ void sound_wave(u8 index, u8 wave) {
 }
 
 static void fill(i16 *buf, size_t len) {
-    if (!sound_enabled) return;
+    if (!sb16_enabled) return;
 
     for (size_t i = 0; i < len; i++) {
         double f = 0.0;
@@ -230,14 +230,14 @@ static void fill(i16 *buf, size_t len) {
 }
 
 static void dsp_write(u8 b) {
-    if (!sound_enabled) return;
+    if (!sb16_enabled) return;
 
     while (inportb(DSP_WRITE) & 0x80);
     outportb(DSP_WRITE, b);
 }
 
 static void dsp_read(u8 b) {
-    if (!sound_enabled) return;
+    if (!sb16_enabled) return;
 
     while (inportb(DSP_READ_STATUS) & 0x80);
     outportb(DSP_READ, b);
@@ -273,13 +273,13 @@ static void reset() {
         goto fail;
     }
 
-    sound_enabled = true;
+    sb16_enabled = true;
 fail:
     return;
 }
 
 static void set_sample_rate(u16 hz) {
-    if (!sound_enabled) return;
+    if (!sb16_enabled) return;
 
     dsp_write(DSP_SET_RATE);
     dsp_write((u8) ((hz >> 8) & 0xFF));
@@ -287,7 +287,7 @@ static void set_sample_rate(u16 hz) {
 }
 
 static void transfer(void *buf, u32 len) {
-    if (!sound_enabled) return;
+    if (!sb16_enabled) return;
 
     u8 mode = 0x48;
 
@@ -317,7 +317,7 @@ static void transfer(void *buf, u32 len) {
 }
 
 static void sb16_irq_handler(struct Registers *regs) {
-    if (!sound_enabled) return;
+    if (!sb16_enabled) return;
 
     buffer_flip = !buffer_flip;
 
@@ -348,7 +348,7 @@ static void configure() {
 void sound_init() {
     irq_install(MIXER_IRQ, sb16_irq_handler);
     reset();
-    if (!sound_enabled) return;
+    if (!sb16_enabled) return;
 
     configure();
 

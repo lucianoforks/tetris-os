@@ -4,7 +4,7 @@
 #include "util.h"
 
 void speaker_note(u8 octave, u8 note);
-void speaker_play(u32 hz);
+void speaker_play(u16 d);
 void speaker_pause();
 
 #endif
