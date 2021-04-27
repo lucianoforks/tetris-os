@@ -36,7 +36,7 @@ Tested on real hardware as well as QEMU.
 #### Mac OS
 For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install i386-elf-binutils i386-elf-gcc`
 ```
-$ make iso
+$ make bin
 $ qemu-system-i386 -drive format=raw,file=boot.bin -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
 ```
 
@@ -47,7 +47,7 @@ You should not need a cross-compiler in *most* cases as the `gcc` shipped in mos
 
 To run:
 ```
-$ make iso
+$ make bin
 $ qemu-system-i386 -drive format=raw,file=boot.bin -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
 ```
 
@@ -74,7 +74,7 @@ Grab and install [i386-elf-toolchain](https://github.com/nativeos/i386-elf-toolc
 
 If everything was installed correctly, you should be able to open MSYS2 MINGW64 terminal and from there just do a 
 ```
->make iso
+>make bin
 >qemu-system-i386 boot.bin -display sdl -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound
 ```
 
