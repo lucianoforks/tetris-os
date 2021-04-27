@@ -2,6 +2,7 @@
 #include "timer.h"
 #include "sound.h"
 #include "math.h"
+#include "speaker.h"
 
 struct Note {
     u8 octave;
@@ -303,6 +304,8 @@ static size_t PART_LENGTHS[TRACK_PARTS];
 static i32 indices[TRACK_PARTS];
 static struct NoteActive current[NUM_NOTES];
 
+extern bool sb16_enabled;
+
 void music_tick() {
     for (size_t i = 0; i < TRACK_PARTS; i++) {
         if (indices[i] == -1 || (current[i].ticks -= 1) <= 0) {
@@ -314,12 +317,20 @@ void music_tick() {
             current[i].note = note;
             current[i].ticks = TICKS_PER_SIXTEENTH * note.duration - remainder;
 
-            sound_note(i, note.octave, note.note);
+            if (sb16_enabled)
+                sound_note(i, note.octave, note.note);
+            else if (i == 0) speaker_note(note.octave, note.note);
         }
 
         // remove last tick to give each note an attack
         if (current[i].ticks <= 1) {
-            sound_note(i, OCTAVE_1, NOTE_NONE);
+            if (sb16_enabled)
+            {
+                sound_note(i, OCTAVE_1, NOTE_NONE);
+            } else if (i == 0)
+            {
+                speaker_note(0, NOTE_NONE);
+            }
         }
     }
 }

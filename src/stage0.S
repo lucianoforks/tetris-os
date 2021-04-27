@@ -8,54 +8,98 @@ _start:
     cli
 
     /* segment setup */
-    mov %cs, %ax
-    mov %ax, %ds
-    mov %ax, %es
-    mov %ax, %fs
-    mov %ax, %gs
-    mov %ax, %ss
+    xorw %ax, %ax
+    movw %ax, %ds
+    movw %ax, %es
 
-    /* place stack pointer in middle of free memory area */
-    movw $0x3000, %sp
+    /* setup stack pointer in middle of free memory area */
+    cli
+    movw %ax, %ss
+    movw $0x7c00, %sp
+    sti
 
     /* save drive number to read kernel later */
     mov %dl, drive_num
-
-    sti
 
     /* should print TETRIS TIME */
     movw $welcome_str, %si
     call print
 
+    movb $8, %ah
+    movb drive_num, %dl
+    int $0x13
+
+    movb %dh, drive_heads
+    andb $0x3f, %cl
+    movb %cl, drive_sectors
+
     /* read kernel into memory at 0x10000 (segment 0x1000).
        kernel binary has been placed on the disk directly after the first sector
-       reading $20 * num_sectors sectors after (value in %cx)
+       How many sectors do we read, value in cx
      */
-    movw $20, %cx
+
+    movw $0x23, %cx
+    movw $0x1000, segment
+    movw $0x0000, offset
+    movw $1, sector
+    movw $2, chs_sector
+sector_loop:
+    push %cx
+
+    movb $0x42, %ah
     movb drive_num, %dl
     movw $disk_packet, %si
-    movw $0x1000, segment
-    movw $1, sector
-sector_loop:
-    movb $0x42, %ah
+    int $0x13
+    jnc disk_success
+
+    movb $0x02, %ah
+    movb $1, %al /* Read 1 sector */
+    movb chs_cylinder, %ch
+    movb chs_sector, %cl
+    movb drive_num, %dl
+    movb chs_head, %dh
+    movw segment, %es
+    movw offset, %bx
     int $0x13
     jc disk_error
 
-    addw $64, sector
-    addw $0x8000, offset
+    call print_dot
+disk_success:
+    incb sector
+/* increase sectors, and check for track limit */
+    incb chs_sector
+    
+    movb drive_sectors, %al
+    cmp %al, chs_sector
+    jna sector_same_head_cylinder
+
+/* sectors per track exceeded, reset sector to 1, increase heads and check for head limit */
+    movb $1, chs_sector
+    incb chs_head
+    mov drive_heads, %al
+    cmp %al, chs_head
+    jna sector_same_head_cylinder
+
+/* head count exceeded, reset head to 0, increase cylinder */
+    movb $0, chs_head
+    incb chs_cylinder
+
+sector_same_head_cylinder:
+    addw $0x200, offset /* we read a single 512 sector, so increase our offset by 0x200 (512) */
     jnc sector_same_segment
 
     /* increment segment, reset offset if on different segment */
     addw $0x1000, segment
     movw $0x0000, offset
 sector_same_segment:
+    pop %cx
     /* decrements %cx and loops if nonzero */
     loop sector_loop
 
     /* video mode: 320x200 @ 16 colors */
-    movb $0x00, %ah
+    xorb %ah, %ah
     movb $0x13, %al
-    int $0x10
+    int $0x10 
 
     /* enable A20 line */
     cli
@@ -67,7 +111,7 @@ sector_same_segment:
     call enable_a20_wait1
     xorw %ax, %ax
     inb $0x60
-
+    
     /* write new state with A20 bit set (0x2) */
     pushw %ax
     call enable_a20_wait0
@@ -82,7 +126,7 @@ sector_same_segment:
     movl %cr0, %eax
     orl $0x1, %eax
     movl %eax, %cr0
-
+    
     /* jmp to flush prefetch queue */
     jmp flush
 flush:
@@ -97,6 +141,7 @@ flush:
     movw %ax, %gs
     movw %ax, %ss
     movl $0x3000, %esp
+    
     ljmp $0x8, $entry32
 
 .code32
@@ -124,8 +169,55 @@ enable_a20_wait1:
     ret
 
 disk_error:
+    mov %ah, %al
+    call print_hex
+
     movw $disk_error_str, %si
     call print
+1:
+    jmp 1b
+
+/* hex value to print in %al */
+print_hex:
+    movb $0x0e, %ah
+
+    movb %al, %bh
+    andb $0x0f, %bh
+
+    andb $0xf0, %al
+    shrb $4, %al
+    movb $0x09, %bl
+
+    call add_hex_ascii
+    int $0x10
+
+    movb %bh, %al
+
+    call add_hex_ascii
+    int $0x10
+
+    ret
+
+/* add correct values a %al to make a nibble into an ascii for hex */
+add_hex_ascii:
+    cmpb %bl, %al
+    ja 1f
+    addb $48, %al
+    jmp 2f
+1:
+    addb $55, %al
+2:
+    ret
+
+/* print char, char in %al */
+print_char:
+    ret
+
+print_dot:
+    movb $0x0e, %ah
+    movb $'.', %al
+    int $0x10
+    ret
 
 /* prints string in %ds:si */
 print:
@@ -140,25 +232,39 @@ print:
 
     /* print %al to screen */
     int $0x10
+    
     jmp print
 
 1:  ret
 
 welcome_str:
-    .asciz "TETRIS TIME\n"
+    .asciz "TETRIS TIME\r\n"
 disk_error_str:
-    .asciz "DISK ERROR\n"
+    .asciz "DISK ERROR\r\n"
+debug_str:
+    .asciz "DEBUG\r\n"
 
+chs_sector:
+    .byte 0x01
+chs_cylinder:
+    .byte 0x00
 /* SAVED DRIVE NUMBER TO READ FROM */
 drive_num:
-    .word 0x0000
+    .byte 0x00
+chs_head:
+    .byte 0x00
+
+drive_heads:
+    .byte 0x00
+drive_sectors:
+    .byte 0x00
 
 /* INT 13H PACKET */
 disk_packet:
     .byte 0x10
     .byte 0x00
 num_sectors:
-    .word 0x0040
+    .word 0x0001
 offset:
     .word 0x0000
 segment:
