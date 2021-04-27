@@ -17,8 +17,16 @@ static u16 notes[7][12] = {
 };
 
 bool note_playing = false;
+u8 current_note = NOTE_NONE;
+u8 current_octave = 0;
 
 void speaker_note(u8 octave, u8 note) {
+    if (octave == current_octave && note == current_note)
+        return;
+
+    current_octave = octave;
+    current_note = note;
+    
     if (note == NOTE_NONE)
     {
         speaker_pause();
