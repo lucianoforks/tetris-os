@@ -307,7 +307,6 @@ static struct NoteActive current[NUM_NOTES];
 extern bool sb16_enabled;
 
 void music_tick() {
-
     for (size_t i = 0; i < TRACK_PARTS; i++) {
         if (indices[i] == -1 || (current[i].ticks -= 1) <= 0) {
             indices[i] = (indices[i] + 1) % PART_LENGTHS[i];
