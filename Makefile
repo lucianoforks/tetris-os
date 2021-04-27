@@ -35,9 +35,9 @@ all: dirs bootsect kernel
 
 clean:
 	rm -f ./**/*.o
-	rm -f ./*.iso
 	rm -f ./**/*.elf
 	rm -f ./**/*.bin
+	rm -f ./*.bin
 
 %.o: %.c
 	$(CC) -o $@ -c $< $(GFLAGS) $(CCFLAGS)
@@ -54,7 +54,7 @@ bootsect: $(BOOTSECT_OBJS)
 kernel: $(KERNEL_OBJS)
 	$(LD) -o ./bin/$(KERNEL) $^ $(LDFLAGS) -Tsrc/link.ld
 
-iso: dirs bootsect kernel
-	dd if=/dev/zero of=boot.iso bs=512 count=2880
-	dd if=./bin/$(BOOTSECT) of=boot.iso conv=notrunc bs=512 seek=0 count=1
-	dd if=./bin/$(KERNEL) of=boot.iso conv=notrunc bs=512 seek=1 count=2048
+bin: dirs bootsect kernel
+	dd if=/dev/zero of=boot.bin bs=512 count=2880
+	dd if=./bin/$(BOOTSECT) of=boot.bin conv=notrunc bs=512 seek=0 count=1
+	dd if=./bin/$(KERNEL) of=boot.bin conv=notrunc bs=512 seek=1
