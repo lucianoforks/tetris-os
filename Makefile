@@ -29,7 +29,7 @@ KERNEL_OBJS=$(KERNEL_C_SRCS:.c=.o) $(KERNEL_S_SRCS:.S=.o)
 
 BOOTSECT=bootsect.bin
 KERNEL=kernel.bin
-ISO=boot.iso
+IMAGE=boot.bin
 
 all: dirs bootsect kernel
 
@@ -54,7 +54,7 @@ bootsect: $(BOOTSECT_OBJS)
 kernel: $(KERNEL_OBJS)
 	$(LD) -o ./bin/$(KERNEL) $^ $(LDFLAGS) -Tsrc/link.ld
 
-bin: dirs bootsect kernel
-	dd if=/dev/zero of=boot.bin bs=512 count=2880
-	dd if=./bin/$(BOOTSECT) of=boot.bin conv=notrunc bs=512 seek=0 count=1
-	dd if=./bin/$(KERNEL) of=boot.bin conv=notrunc bs=512 seek=1
+image: dirs bootsect kernel
+	dd if=/dev/zero of=$(IMAGE) bs=512 count=2880
+	dd if=./bin/$(BOOTSECT) of=$(IMAGE) conv=notrunc bs=512 seek=0 count=1
+	dd if=./bin/$(KERNEL) of=$(IMAGE) conv=notrunc bs=512 seek=1
