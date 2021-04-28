@@ -715,6 +715,7 @@ void _main(u32 magic) {
 
         if (sound_enabled() && now != last) {
             music_tick();
+            sound_tick();
             last = now;
         }
 
