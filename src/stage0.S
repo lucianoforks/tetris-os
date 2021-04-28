@@ -27,28 +27,73 @@ _start:
     movw $welcome_str, %si
     call print
 
+    movb $8, %ah
+    movb drive_num, %dl
+    int $0x13
+
+    movb %dh, num_heads
+    andb $0x3f, %cl
+    movb %cl, sectors_per_track
+
     /* read kernel into memory at 0x10000 (segment 0x1000).
        kernel binary has been placed on the disk directly after the first sector
-       reading $20 * num_sectors sectors after (value in %cx)
+       How many sectors do we read, value in cx
      */
-    movw $20, %cx
+
+    movw $0x40, %cx
+    movw $0x1000, segment
+    movw $0x0000, offset
+    movw $1, sector
+    movw $2, chs_sector
+sector_loop:
+    push %cx
+
+    movb $0x42, %ah
     movb drive_num, %dl
     movw $disk_packet, %si
-    movw $0x1000, segment
-    movw $1, sector
-sector_loop:
-    movb $0x42, %ah
+    int $0x13
+    jnc disk_success 
+
+    movb $0x02, %ah
+    movb $1, %al /* Read 1 sector */
+    movb chs_cylinder, %ch
+    movb chs_sector, %cl
+    movb drive_num, %dl
+    movb chs_head, %dh
+    movw segment, %es
+    movw offset, %bx
     int $0x13
     jc disk_error
 
-    addw $64, sector
-    addw $0x8000, offset
+disk_success:
+    incb sector
+/* increase sectors, and check for track limit */
+    incb chs_sector
+    
+    movb sectors_per_track, %al
+    cmp %al, chs_sector
+    jna sector_same_head_cylinder
+
+/* sectors per track exceeded, reset sector to 1, increase heads and check for head limit */
+    movb $1, chs_sector
+    incb chs_head
+    mov num_heads, %al
+    cmp %al, chs_head
+    jna sector_same_head_cylinder
+
+/* head count exceeded, reset head to 0, increase cylinder */
+    movb $0, chs_head
+    incb chs_cylinder
+
+sector_same_head_cylinder:
+    addw $0x200, offset /* we read a single 512 sector, so increase our offset by 0x200 (512) */
     jnc sector_same_segment
 
     /* increment segment, reset offset if on different segment */
     addw $0x1000, segment
     movw $0x0000, offset
 sector_same_segment:
+    pop %cx
     /* decrements %cx and loops if nonzero */
     loop sector_loop
 
@@ -145,20 +190,33 @@ print:
 1:  ret
 
 welcome_str:
-    .asciz "TETRIS TIME\n"
+    .asciz "TETRIS TIME\r\n"
 disk_error_str:
-    .asciz "DISK ERROR\n"
+    .asciz "DISK ERROR\r\n"
 
+chs_sector:
+    .byte 0x01
+chs_cylinder:
+    .byte 0x00
 /* SAVED DRIVE NUMBER TO READ FROM */
 drive_num:
-    .word 0x0000
+    .byte 0x00
+chs_head:
+    .byte 0x00
+
+marker:
+    .byte 0xde,0xad,0xbe,0xef
+num_heads:
+    .byte 0x00
+sectors_per_track:
+    .byte 0x00
 
 /* INT 13H PACKET */
 disk_packet:
     .byte 0x10
     .byte 0x00
 num_sectors:
-    .word 0x0040
+    .word 0x0001
 offset:
     .word 0x0000
 segment:
