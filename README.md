@@ -50,7 +50,7 @@ Good luck. Maybe try dual booting with Linux if this doesn't work out :)
   - `make`, `gcc`, etc. should now be in your `PATH`
 
 ```
-> make iso
+> make img
 > qemu-system-i386 -drive format=raw,file=boot.img -display sdl -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound
 ```
 
