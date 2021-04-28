@@ -147,7 +147,7 @@ static const f64 NOTES[NUM_OCTAVES * OCTAVE_SIZE] = {
 #define DSP_VOLUME  0x22
 #define DSP_IRQ     0x80
 
-#define SAMPLE_RATE     21500
+#define SAMPLE_RATE     22050
 #define BUFFER_MS       40
 
 #define BUFFER_SIZE ((size_t) (SAMPLE_RATE * (BUFFER_MS / 1000.0)))
