@@ -1,6 +1,3 @@
-// remove to disable music, useful when building for hardware without an SB16
-#define ENABLE_MUSIC
-
 #include "util.h"
 #include "screen.h"
 #include "idt.h"
@@ -12,11 +9,8 @@
 #include "keyboard.h"
 #include "speaker.h"
 #include "fpu.h"
-
-#ifdef ENABLE_MUSIC
 #include "sound.h"
 #include "music.h"
-#endif
 
 #define FPS 30
 #define LEVELS 30
@@ -702,12 +696,13 @@ void _main(u32 magic) {
     keyboard_init();
     generate_sprites();
 
-#ifdef ENABLE_MUSIC
     sound_init();
-    music_init();
-    state.music = true;
-    sound_master(255);
-#endif
+
+    if (sound_enabled()) {
+        music_init();
+        state.music = true;
+        sound_master(255);
+    }
 
     state.menu = true;
 
@@ -718,12 +713,10 @@ void _main(u32 magic) {
     while (true) {
         const u32 now = (u32) timer_get();
 
-#ifdef ENABLE_MUSIC
-        if (now != last) {
+        if (sound_enabled() && now != last) {
             music_tick();
             last = now;
         }
-#endif
 
         if ((now - last_frame) > (TIMER_TPS / FPS)) {
             last_frame = now;
@@ -736,8 +729,7 @@ void _main(u32 magic) {
                 render();
             }
 
-#ifdef ENABLE_MUSIC
-            if (keyboard_char('m')) {
+            if (sound_enabled() && keyboard_char('m')) {
                 if (!last_music_toggle) {
                     state.music = !state.music;
                     sound_master(state.music ? 255 : 0);
@@ -747,7 +739,12 @@ void _main(u32 magic) {
             } else {
                 last_music_toggle = false;
             }
-#endif
+
+            // controlled in system.c
+            const char *notification = get_notification();
+            if (notification != NULL) {
+                font_str_doubled(notification, 0, 0, COLOR(6, 1, 1));
+            }
 
             screen_swap();
             state.frames++;

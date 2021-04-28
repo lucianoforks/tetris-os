@@ -54,7 +54,6 @@ bootsect: $(BOOTSECT_OBJS)
 kernel: $(KERNEL_OBJS)
 	$(LD) -o ./bin/$(KERNEL) $^ $(LDFLAGS) -Tsrc/link.ld
 
-<<<<<<< HEAD
 img: dirs bootsect kernel
 	dd if=/dev/zero of=$(IMG) bs=512 count=2880
 	dd if=./bin/$(BOOTSECT) of=boot.img conv=notrunc bs=512 seek=0 count=1

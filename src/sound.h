@@ -41,6 +41,8 @@
 #define WAVE_NOISE      2
 #define WAVE_TRIANGLE   3
 
+bool sound_enabled();
+void sound_set_enabled(bool enabled);
 void sound_init();
 void sound_note(u8 index, u8 octave, u8 note);
 void sound_master(u8 v);
