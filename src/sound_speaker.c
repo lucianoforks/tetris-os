@@ -46,14 +46,18 @@ static void play(u16 d) {
 void sound_tick_device() {
     const u8 note = sound_get_note(0);
 
-    if (note != current_note) {
-        play(notes[note >> 4][note & 0xF]);
-    } else if ((note & 0xF) == NOTE_NONE) {
+    if (note == current_note) 
+        return;
+
+    current_note = note;
+
+    if ((note & 0xF) == NOTE_NONE) {
         pause();
         return;
     }
 
-    current_note = note;
+    if (note == current_note) 
+        play(notes[note >> 4][note & 0xF]);
 }
 
 void sound_init_device() {
