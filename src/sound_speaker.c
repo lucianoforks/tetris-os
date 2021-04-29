@@ -23,6 +23,7 @@ static bool playing = false;
 static u8 current_note = NOTE_NONE;
 
 static void pause() {
+    playing = false;
     outportb(0x61, inportb(0x61) & 0xFC);
 }
 
@@ -45,11 +46,12 @@ static void play(u16 d) {
 
 void sound_tick_device() {
     const u8 note = sound_get_note(0);
-
+    
     if (note == current_note) {
         return;
-    } else if (note == NOTE_NONE) {
+    } else if ((note & 0xF) == NOTE_NONE) {
         pause();
+        return;
     }
 
     play(notes[note >> 4][note & 0xF]);
