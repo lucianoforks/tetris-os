@@ -70,7 +70,7 @@ disk_success:
     call print_dot
 
 /* increase sectors, and check for track limit */
-    incb sector
+    incl sector
     incb chs_sector
     
     movb drive_sectors, %al
