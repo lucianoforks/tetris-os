@@ -52,7 +52,6 @@ $ qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -
 For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install i386-elf-binutils i386-elf-gcc`
 
 To run use `$ make qemu-mac`
->>>>>>> upstream/master
 
 #### Unix-like
 You should not need a cross-compiler in *most* cases as the `gcc` shipped in most linux distros will support `i386` targets.
