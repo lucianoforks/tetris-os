@@ -7,7 +7,6 @@
 #include "font.h"
 #include "system.h"
 #include "keyboard.h"
-#include "speaker.h"
 #include "fpu.h"
 #include "sound.h"
 #include "music.h"
