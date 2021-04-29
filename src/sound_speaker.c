@@ -49,11 +49,16 @@ void sound_tick_device() {
 
     if (note == current_note) {
         return;
-    } else if ((note & 0xF) == NOTE_NONE) {
-        pause();
-    }else if (note != current_note) {
-        play(notes[note >> 4][note & 0xF]);
     }
+    
+    current_note = note;
+
+    if ((note & 0xF) == NOTE_NONE) {
+        pause();
+        return;
+    }
+    
+    play(notes[note >> 4][note & 0xF]);
 }
 
 void sound_init_device() {
