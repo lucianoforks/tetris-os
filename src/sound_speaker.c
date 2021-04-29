@@ -20,7 +20,7 @@ static u16 notes[7][12] = {
 };
 
 static bool playing = false;
-static u8 current_note = NOTE_NONE;
+static u8 current_note = 0xff;
 
 static void pause() {
     playing = false;
@@ -31,7 +31,6 @@ static void play(u16 d) {
     outportb(0x43, 0xB6);
     outportb(0x42, (u8) (d & 0xFF));
     outportb(0x42, (u8) ((d >> 8) & 0xFF));
-
 
     // If there already is a note playing, re-enabling it just makes the timer
     // start over - thus it gets choppy. By just changing the frequency when
@@ -46,14 +45,17 @@ static void play(u16 d) {
 
 void sound_tick_device() {
     const u8 note = sound_get_note(0);
-    
-    if (note == current_note) {
+
+    if (note == current_note)
         return;
-    } else if ((note & 0xF) == NOTE_NONE) {
+        
+    current_note = note;
+
+    if ((note & 0xF) == NOTE_NONE) {
         pause();
         return;
     }
-
+    
     play(notes[note >> 4][note & 0xF]);
 }
 
