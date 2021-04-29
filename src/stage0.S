@@ -25,6 +25,7 @@ _start:
     movw $welcome_str, %si
     call print
 
+    /* read drive parameters, INT 13h AH=8h */
     movb $8, %ah
     movb drive_num, %dl
     int $0x13
@@ -46,14 +47,16 @@ _start:
 sector_loop:
     push %cx
 
+    /* attempt read with "extended read sectors from drive" (AH=42h) */
     movb $0x42, %ah
     movb drive_num, %dl
     movw $disk_packet, %si
     int $0x13
     jnc disk_success
 
+    /* fall back to CHS read/"read sectors from drive" (AH=02h) */
     movb $0x02, %ah
-    movb $1, %al /* Read 1 sector */
+    movb $1, %al
     movb chs_cylinder, %ch
     movb chs_sector, %cl
     movb drive_num, %dl
@@ -63,9 +66,9 @@ sector_loop:
     int $0x13
     jc disk_error
 
-    call print_dot
 disk_success:
-    incb sector
+    call print_dot
+
 /* increase sectors, and check for track limit */
     incb chs_sector
     
@@ -76,6 +79,7 @@ disk_success:
 /* sectors per track exceeded, reset sector to 1, increase heads and check for head limit */
     movb $1, chs_sector
     incb chs_head
+    
     mov drive_heads, %al
     cmp %al, chs_head
     jna sector_same_head_cylinder
@@ -85,7 +89,8 @@ disk_success:
     incb chs_cylinder
 
 sector_same_head_cylinder:
-    addw $0x200, offset /* we read a single 512 sector, so increase our offset by 0x200 (512) */
+    /* single 512 sector read, increase offset by 0x200 (512) */
+    addw $0x200, offset
     jnc sector_same_segment
 
     /* increment segment, reset offset if on different segment */
@@ -93,7 +98,6 @@ sector_same_head_cylinder:
     movw $0x0000, offset
 sector_same_segment:
     pop %cx
-    /* decrements %cx and loops if nonzero */
     loop sector_loop
 
     /* video mode: 320x200 @ 16 colors */
@@ -241,19 +245,17 @@ welcome_str:
     .asciz "TETRIS TIME\r\n"
 disk_error_str:
     .asciz "DISK ERROR\r\n"
-debug_str:
-    .asciz "DEBUG\r\n"
 
 chs_sector:
     .byte 0x01
 chs_cylinder:
     .byte 0x00
-/* SAVED DRIVE NUMBER TO READ FROM */
-drive_num:
-    .byte 0x00
 chs_head:
     .byte 0x00
 
+/* SAVED DRIVE DETAILS */
+drive_num:
+    .byte 0x00
 drive_heads:
     .byte 0x00
 drive_sectors:

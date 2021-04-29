@@ -33,6 +33,7 @@ This is a fork of TETRIS-OS originally by jdh
 - [James Molloy's Kernel Development Tutorials](http://www.jamesmolloy.co.uk/tutorial_html/)
 
 ### Building & Running
+<<<<<<< HEAD
 Tested on real hardware as well as QEMU.
 
 #### Mac OS
@@ -41,12 +42,23 @@ For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install 
 $ make bin
 $ qemu-system-i386 -drive format=raw,file=boot.bin -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
 ```
+=======
+~~**NOTE**: This has *only* been tested in an emulator. Real hardware might not like it.~~
+
+ EDIT: this is not true anymore! [@parkerlreed has run this on a Thinkpad T510](https://github.com/jdah/tetris-os/issues/5#issuecomment-824507979).
+
+#### Mac OS
+For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install i386-elf-binutils i386-elf-gcc`
+
+To run use `$ make qemu-mac`
+>>>>>>> upstream/master
 
 #### Unix-like
 You should not need a cross-compiler in *most* cases as the `gcc` shipped in most linux distros will support `i386` targets.
 
 [If this isn't the case for you, read here about getting a cross-compiler.](https://wiki.osdev.org/GCC_Cross-Compiler)
 
+<<<<<<< HEAD
 To run:
 ```
 $ make bin
@@ -58,10 +70,16 @@ If you have sound device issues:
 `$ qemu-system-i386 -drive format=raw,file=boot.bin`.
 - Try using the SDL backend for QEMU:  
 `$ qemu-system-i386 -display sdl -drive format=raw,file=boot.bin -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl`
+=======
+To run use `$ make qemu-pulse`
+
+If you have sound device issues, try the SDL backend for QEMU with `$ make qemu-sdl` or disable any audio devices with `$make qemu-no-audio`
+>>>>>>> upstream/master
 
 If you're having issues with no image showing up/QEMU freezing, this is a known bug with QEMU SB16 emulation under GTK. [Please read what @takaswie has written in #2 for a workaround](https://github.com/jdah/tetris-os/issues/2#issuecomment-824773889).
 
 #### Windows
+<<<<<<< HEAD
 ##### Running
 Grab the image file from the releases, and run it with qemu with command `qemu-system-i386 -display sdl -drive format=raw,file=boot.bin -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound`. This combats the GTK rendering bug with SB16 enabled. If your sound is choppy, try to fiddle with the audio settings, for instance running with `qemu-system-i386 -display sdl -drive format=raw,file=boot.bin -audiodev id=dsound,driver=dsound,out.fixed-settings=on,out.frequency=22050,out.buffer-length=80000,timer-period=100 -device sb16,audiodev=dsound` to increase the audio buffer and set a different timer period for updating the audio. Lowering the sample quality from 44 kHz to 22kHz helps combat choppy audio and buffer underruns with not that much of an audio quality hit.
 
@@ -82,3 +100,22 @@ If everything was installed correctly, you should be able to open MSYS2 MINGW64 
 
 #### Real hardware
 You probably know what you're doing if you're going to try this. Just burn `boot.bin` onto some bootable media and give it a go. SB16 is dynamically disabled in case it's not found or it's reset procedure fails, but if things break, try disabling all of the music (remove `#define ENABLE_MUSIC` in `main.c`) since you *probably* don't have something with a SB16 in it.
+=======
+
+Good luck. Maybe try dual booting with Linux if this doesn't work out :)
+
+- Follow the Unix-like instructions while using WSL 
+- Using  [MSYS2](https://www.msys2.org/) and the [i386-elf-toolchain](https://github.com/nativeos/i386-elf-toolchain/releases)
+  - Extract the binaries of the GCC and binutils releases to your mingw64 folder (likely at `C:\msys64\mingw64`)
+  - `make`, `gcc`, etc. should now be in your `PATH`
+
+```
+> make img
+> qemu-system-i386 -drive format=raw,file=boot.img -display sdl -audiodev id=dsound,driver=dsound -device sb16,audiodev=dsound
+```
+
+If sound is broken or choppy, try running with  `> qemu-system-i386 -display sdl -drive format=raw,file=boot.img -audiodev id=dsound,driver=dsound,out.fixed-settings=on,out.frequency=22050,out.buffer-length=80000,timer-period=100 -device sb16,audiodev=dsound`
+
+#### Real hardware
+You probably know what you're doing if you're going to try this. Just burn `boot.img` onto some bootable media and give it a go. The SB16 is dynamically disabled in case it's not found or it's reset procedure fails, but if things continue to break try removing all references to sound or music first.
+>>>>>>> upstream/master
