@@ -51,6 +51,8 @@ void sound_tick_device() {
     } else if ((note & 0xF) == NOTE_NONE) {
         pause();
     }
+
+    current_note = note;
 }
 
 void sound_init_device() {
