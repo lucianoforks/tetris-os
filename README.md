@@ -41,7 +41,7 @@ Tested on real hardware as well as QEMU.
 For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install i386-elf-binutils i386-elf-gcc`
 ```
 $ make bin
-$ qemu-system-i386 -drive format=raw,file=boot.bin -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
+$ qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
 ```
 =======
 ~~**NOTE**: This has *only* been tested in an emulator. Real hardware might not like it.~~
