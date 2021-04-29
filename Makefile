@@ -10,11 +10,18 @@ else
 	LD=i386-elf-ld
 endif
 
+SOUND_FLAGS=-DSOUND_SB16
+
+ifeq ($(SOUND),1)
+	SOUND_FLAGS=-DSOUND_PCSPK
+endif
+
 GFLAGS=
 CCFLAGS=-m32 -std=c11 -O2 -g -Wall -Wextra -Wpedantic -Wstrict-aliasing
 CCFLAGS+=-Wno-pointer-arith -Wno-unused-parameter
 CCFLAGS+=-nostdlib -nostdinc -ffreestanding -fno-pie -fno-stack-protector
 CCFLAGS+=-fno-builtin-function -fno-builtin
+CCFLAGS+=$(SOUND_FLAGS)
 ASFLAGS=
 LDFLAGS=
 
@@ -60,14 +67,19 @@ img: dirs bootsect kernel
 	dd if=./bin/$(KERNEL) of=boot.img conv=notrunc bs=512 seek=1 count=2048
 
 qemu-mac: img
-	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
+	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32  -machine pcspk-audiodev=dsound
 
 qemu-pulse: img
-	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
+	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32  -machine pcspk-audiodev=dsound
 
 qemu-sdl: img
-	qemu-system-i386 -display sdl -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl
+	qemu-system-i386 -display sdl -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl  -machine pcspk-audiodev=dsound
 
 qemu-no-audio: img
 	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio
+
+qemu-win: img
+	echo $(SOUND)
+	echo $(SOUND_FLAGS)
+	qemu-system-i386 -display sdl -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -audiodev dsound,id=dsound -device sb16,audiodev=dsound -machine pcspk-audiodev=dsound
 
