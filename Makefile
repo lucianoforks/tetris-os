@@ -29,20 +29,13 @@ KERNEL_OBJS=$(KERNEL_C_SRCS:.c=.o) $(KERNEL_S_SRCS:.S=.o)
 
 BOOTSECT=bootsect.bin
 KERNEL=kernel.bin
-<<<<<<< HEAD
-IMAGE=boot.bin
-=======
 IMG=boot.img
->>>>>>> upstream/master
 
 all: image
 
 clean:
 	rm -f ./**/*.o
-<<<<<<< HEAD
-=======
 	rm -f ./*.img
->>>>>>> upstream/master
 	rm -f ./**/*.elf
 	rm -f ./**/*.bin
 	rm -f ./*.bin
@@ -62,12 +55,6 @@ bootsect: $(BOOTSECT_OBJS)
 kernel: $(KERNEL_OBJS)
 	$(LD) -o ./bin/$(KERNEL) $^ $(LDFLAGS) -Tsrc/link.ld
 
-<<<<<<< HEAD
-image: dirs bootsect kernel
-	dd if=/dev/zero of=$(IMAGE) bs=512 count=2880
-	dd if=./bin/$(BOOTSECT) of=$(IMAGE) conv=notrunc bs=512 seek=0 count=1
-	dd if=./bin/$(KERNEL) of=$(IMAGE) conv=notrunc bs=512 seek=1
-=======
 img: dirs bootsect kernel
 	dd if=/dev/zero of=$(IMG) bs=512 count=2880
 	dd if=./bin/$(BOOTSECT) of=boot.img conv=notrunc bs=512 seek=0 count=1
@@ -85,4 +72,3 @@ qemu-sdl: img
 qemu-no-audio: img
 	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio
 
->>>>>>> upstream/master
