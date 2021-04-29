@@ -4,12 +4,14 @@ This is a fork of TETRIS-OS originally by jdh
 - Dynamically disabled SB16 so same binary works whether you have an SB16 or not.
 - CHS reads as backup in case LBA reads fail
 - Simple PC Speaker music. (Build by modifying `sound.h`, uncommenting `#define SOUND_PCSPK` and commenting `#define SOUND_SB16`)
+##### Other changes
+- Incorporates the single back buffer fix from https://github.com/jdah/tetris-os/pull/11
 ##### Planned
 - Simple PC Speaker music playback in case SB16 is not found.
 - Fixing SB16 compatibility
 - High quality PWM-based speaker sound
 ##### Wishful thinking
-- Refactor sound API to make writing different sound drivers possible
+- ~~Refactor sound API to make writing different sound drivers possible~~ Implemented in upstream
 - AC97 or HD-audio, depending on what is onboard my old computer. Requires PCI setup among other things, so not the easiest thing to combat.
 
 # TETRIS-OS: An operating system that only plays Tetris.
