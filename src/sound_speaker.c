@@ -55,9 +55,8 @@ void sound_tick_device() {
         pause();
         return;
     }
-
-    if (note == current_note) 
-        play(notes[note >> 4][note & 0xF]);
+    
+    play(notes[note >> 4][note & 0xF]);
 }
 
 void sound_init_device() {
