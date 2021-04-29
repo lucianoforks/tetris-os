@@ -38,7 +38,6 @@ clean:
 	rm -f ./*.img
 	rm -f ./**/*.elf
 	rm -f ./**/*.bin
-	rm -f ./*.bin
 
 %.o: %.c
 	$(CC) -o $@ -c $< $(GFLAGS) $(CCFLAGS)
