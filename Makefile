@@ -79,7 +79,5 @@ qemu-no-audio: img
 	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio
 
 qemu-win: img
-	echo $(SOUND)
-	echo $(SOUND_FLAGS)
 	qemu-system-i386 -display sdl -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -audiodev dsound,id=dsound -device sb16,audiodev=dsound -machine pcspk-audiodev=dsound
 
