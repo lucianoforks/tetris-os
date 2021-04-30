@@ -56,8 +56,8 @@ kernel: $(KERNEL_OBJS)
 
 img: dirs bootsect kernel
 	dd if=/dev/zero of=$(IMG) bs=512 count=2880
-	dd if=./bin/$(BOOTSECT) of=boot.img conv=notrunc bs=512 seek=0 count=1
-	dd if=./bin/$(KERNEL) of=boot.img conv=notrunc bs=512 seek=1 count=2048
+	dd if=./bin/$(BOOTSECT) of=$(IMG) conv=notrunc bs=512 seek=0 count=1
+	dd if=./bin/$(KERNEL) of=$(IMG) conv=notrunc bs=512 seek=1 count=2048
 
 qemu-mac: img
 	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
