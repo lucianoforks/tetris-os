@@ -60,14 +60,14 @@ img: dirs bootsect kernel
 	dd if=./bin/$(KERNEL) of=$(IMG) conv=notrunc bs=512 seek=1 count=2048
 
 qemu-mac: img
-	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
+	qemu-system-i386 -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
 
 qemu-pulse: img
-	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
+	qemu-system-i386 -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
 
 qemu-sdl: img
-	qemu-system-i386 -display sdl -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl
+	qemu-system-i386 -display sdl -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl
 
 qemu-no-audio: img
-	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio
+	qemu-system-i386 -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio
 
