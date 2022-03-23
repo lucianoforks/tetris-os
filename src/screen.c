@@ -2,12 +2,10 @@
 
 static u8 *BUFFER = (u8 *) 0xA0000;
 
-// double buffers
-u8 _sbuffers[2][SCREEN_SIZE];
-u8 _sback = 0;
+//screen buffer
+u8 _sbuffer[SCREEN_SIZE];
 
-#define CURRENT (_sbuffers[_sback])
-#define SWAP() (_sback = 1 - _sback)
+#define CURRENT (_sbuffer)
 
 // VGA control port addresses
 #define PALETTE_MASK 0x3C6
@@ -17,7 +15,6 @@ u8 _sback = 0;
 
 void screen_swap() {
     memcpy(BUFFER, &CURRENT, SCREEN_SIZE);
-    SWAP();
 }
 
 void screen_clear(u8 color) {

@@ -7,7 +7,6 @@
 #include "font.h"
 #include "system.h"
 #include "keyboard.h"
-#include "speaker.h"
 #include "fpu.h"
 #include "sound.h"
 #include "music.h"
@@ -694,14 +693,18 @@ void _main(u32 magic) {
     screen_init();
     timer_init();
     keyboard_init();
-    sound_init();
     generate_sprites();
-    music_init();
+
+    sound_init();
+
+    if (sound_enabled()) {
+        music_init();
+        state.music = true;
+        sound_master(255);
+    }
 
     state.menu = true;
 
-    state.music = true;
-    sound_master(255);
 
     bool last_music_toggle = false;
     u32 last_frame = 0, last = 0;
@@ -709,8 +712,9 @@ void _main(u32 magic) {
     while (true) {
         const u32 now = (u32) timer_get();
 
-        if (now != last) {
+        if (sound_enabled() && now != last) {
             music_tick();
+            sound_tick();
             last = now;
         }
 
@@ -725,7 +729,7 @@ void _main(u32 magic) {
                 render();
             }
 
-            if (keyboard_char('m')) {
+            if (sound_enabled() && keyboard_char('m')) {
                 if (!last_music_toggle) {
                     state.music = !state.music;
                     sound_master(state.music ? 255 : 0);
@@ -734,6 +738,12 @@ void _main(u32 magic) {
                 last_music_toggle = true;
             } else {
                 last_music_toggle = false;
+            }
+
+            // controlled in system.c
+            const char *notification = get_notification();
+            if (notification != NULL) {
+                font_str_doubled(notification, 0, 0, COLOR(6, 1, 1));
             }
 
             screen_swap();

@@ -1,6 +1,16 @@
 #include "system.h"
 #include "screen.h"
 #include "font.h"
+#include "timer.h"
+
+#define NOTIFICATION_DURATION_TICKS (TIMER_TPS * 2)
+
+static struct {
+    char content[512];
+    u64 ticks;
+} notification = {
+    "", -1
+};
 
 static u32 rseed = 1;
 
@@ -32,4 +42,20 @@ void panic(const char *err) {
 
     screen_swap();
     for (;;) {}
+}
+
+const char *get_notification() {
+    return timer_get() - notification.ticks <= NOTIFICATION_DURATION_TICKS ?
+        ((const char *) &notification.content) : NULL;
+}
+
+void notify(const char *message) {
+    memcpy(
+        &notification.content,
+        message,
+        MIN(strlen(message) + 1, sizeof(notification.content))
+    );
+
+    notification.content[sizeof(notification.content) - 1] = 0;
+    notification.ticks = timer_get();
 }

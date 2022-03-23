@@ -25,13 +25,12 @@
             CLAMP(COLOR_B(_c) + __d, 0, 3)      \
         );})
 
-extern u8 _sbuffers[2][SCREEN_SIZE];
-extern u8 _sback;
+extern u8 _sbuffer[SCREEN_SIZE];
 
-#define screen_buffer() (_sbuffers[_sback])
+#define screen_buffer() (_sbuffer)
 
 #define screen_set(_p, _x, _y)\
-    (_sbuffers[_sback][((_y) * SCREEN_WIDTH + (_x))]=(_p))
+    (_sbuffer[((_y) * SCREEN_WIDTH + (_x))]=(_p))
 
 #define screen_offset(_x, _y) (screen_buffer()[(_y) * SCREEN_WIDTH + (_x)])
 
