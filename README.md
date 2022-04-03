@@ -24,7 +24,7 @@ $ qemu-system-i386 -drive format=raw,file=boot.iso -d cpu_reset -monitor stdio -
 Use the same command as Mac OS, but try with `pulseaudio` as the audio device.
 
 ##### Windows
-Absolutely no idea.
+Absolutely no idea. Some People sorta need this.
 
 ##### Real hardware
 You probably know what you're doing if you're going to try this. Just burn `boot.iso` onto some bootable media and give it a go. If things break, try disabling all of the music since you *probably* don't have something with a SB16 in it.
