@@ -36,7 +36,6 @@ This is a fork of TETRIS-OS originally by jdh
 - [James Molloy's Kernel Development Tutorials](http://www.jamesmolloy.co.uk/tutorial_html/)
 
 ### Building & Running
-<<<<<<< HEAD
 Tested on real hardware as well as QEMU.
 
 #### Mac OS
@@ -45,13 +44,6 @@ For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install 
 $ make bin
 $ qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
 ```
-=======
-~~**NOTE**: This has *only* been tested in an emulator. Real hardware might not like it.~~
-
- EDIT: this is not true anymore! [@parkerlreed has run this on a Thinkpad T510](https://github.com/jdah/tetris-os/issues/5#issuecomment-824507979).
-
-#### Mac OS
-For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install i386-elf-binutils i386-elf-gcc`
 
 To run use `$ make qemu-mac`
 
