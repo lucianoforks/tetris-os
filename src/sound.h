@@ -3,6 +3,10 @@
 
 #include "util.h"
 
+// SOUND BACKENDS, enable one
+// #define SOUND_SB16
+// #define SOUND_PCSPK
+
 #define NUM_NOTES 8
 
 #define NUM_OCTAVES 7
@@ -41,10 +45,17 @@
 #define WAVE_NOISE      2
 #define WAVE_TRIANGLE   3
 
+bool sound_enabled();
+void sound_set_enabled(bool enabled);
 void sound_init();
+void sound_tick();
 void sound_note(u8 index, u8 octave, u8 note);
+u8 sound_get_note(u8 index);
 void sound_master(u8 v);
+u8 sound_get_master();
 void sound_volume(u8 index, u8 v);
+u8 sound_get_volume(u8 index);
 void sound_wave(u8 index, u8 wave);
+u8 sound_get_wave(u8 index);
 
 #endif
